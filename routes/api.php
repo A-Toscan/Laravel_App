@@ -28,15 +28,4 @@ Route::post('/tasks', [TaskController::class, 'createTask']);
 Route::get('/tasks/{id}', [TaskController::class, 'getAlltasks']);
 Route::put('/tasks/{id}', [TaskController::class, 'updateTask']);
 Route::delete('/tasks/{id}', [TaskController::class, 'deleteTask']);
-Route::get('/tasks', function () {
-    //recuperaria información
-    return 'Get tasks';
-});
-Route::put('/tasks/{id}', function ($id) {
-    //recuperaria información
-    return 'Update task with id: ' . $id;
-});
-Route::delete('/tasks/{id}', function ($id) {
-    //recuperaria información
-    return 'Delete task with id: ' . $id;
-});
+
