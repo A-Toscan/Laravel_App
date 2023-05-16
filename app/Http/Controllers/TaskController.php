@@ -54,9 +54,33 @@ class TaskController extends Controller
         }
     }
 
-    public function getAllTasks()
+    public function getAllTasks($id)
     {
-        return 'Get Tasks';
+        try {
+
+            $tasks = Task::query()
+            ->where('user_id', '=', $id)
+            ->get()
+            ->toArray();
+
+            return response()->json([
+                [
+                    "success" => true,
+                    "message" => "Get all tasks successfully",
+                    "data" => $tasks
+                ],
+                201
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    "success" => false,
+                    "message" => "Error getting tasks",
+                    "error" => $th->getMessage()
+                ],
+                500
+            );
+        }
     }
 
     public function updateTask($id)

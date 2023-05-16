@@ -25,7 +25,7 @@ Route::post('/tasks', function () {
     return 'Created task';
 });
 Route::post('/tasks', [TaskController::class, 'createTask']);
-Route::get('/tasks', [TaskController::class, 'getAlltasks']);
+Route::get('/tasks/{id}', [TaskController::class, 'getAlltasks']);
 Route::put('/tasks/{id}', [TaskController::class, 'updateTask']);
 Route::delete('/tasks/{id}', [TaskController::class, 'deleteTask']);
 Route::get('/tasks', function () {
