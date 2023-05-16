@@ -1,9 +1,7 @@
 <?php
-
 use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,20 +12,31 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+//todas las rutas con el prefijo api se debe colocar en la ruta der servidor para que funcione
 Route::get('/', function () {
-    return 'Welcome to my App';
+    //recuperaria información
+    return 'Bienvenidos a mi app';
 });
-
-// Tasks
-Route::post('/tasks', [TaskController::class, `getTask`]);
-
-Route::get('/tasks', [TaskController::class, `createTask`]);
-
-Route::put('/tasks/{id}', [TaskController::class, 'updateTask with id' .$id]);
-
-Route::delete('/tasks/{id}', [TaskController::class, 'deleteTask with id' .$id]);
-
+Route::post('/tasks', function () {
+    //recuperaria información
+    return 'Created task';
+});
+Route::post('/tasks', [TaskController::class, 'createTask']);
+Route::get('/tasks', [TaskController::class, 'getAlltasks']);
+Route::put('/tasks/{id}', [TaskController::class, 'updateTask']);
+Route::delete('/tasks/{id}', [TaskController::class, 'deleteTask']);
+Route::get('/tasks', function () {
+    //recuperaria información
+    return 'Get tasks';
+});
+Route::put('/tasks/{id}', function ($id) {
+    //recuperaria información
+    return 'Update task with id: ' . $id;
+});
+Route::delete('/tasks/{id}', function ($id) {
+    //recuperaria información
+    return 'Delete task with id: ' . $id;
+});

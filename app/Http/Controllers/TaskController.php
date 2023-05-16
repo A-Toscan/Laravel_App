@@ -3,23 +3,60 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\TryCatch;
 
 class TaskController extends Controller
 {
-    public function createTask() {
-        return 'Create Task';
+    public function createTask(Request $request)
+    {
+
+        try {
+            $title = $request->input('title');
+            $description = $request->input('description');
+            $userId = $request->input('user_id');
+
+            //TODO Validaciones
+
+            // Insert using query builder
+            $newTask = DB::table('tasks')->insert([
+                'title' => $title,
+                'description' => $description,
+                'user_id' => $userId
+            ]);
+
+            return response()->json([
+                [
+                    "success" => true,
+                    "message" => "Create tasks successfully",
+                    "data" => $newTask
+                ],
+                201
+            ]);
+        } catch (\Throwable $th) {
+           return response()->json(
+            [
+                "success" => false,
+                    "message" => "Error creating tasks",
+                    "data" => $th->getMessage()
+            ],
+            500
+        );
+        }
     }
 
-    public function getTask() {
+    public function getAllTasks()
+    {
         return 'Get Tasks';
     }
 
-    public function updateTask($id) {
-        return 'Update Tasks with id: ' .$id;
+    public function updateTask($id)
+    {
+        return 'Update Tasks with id: ' . $id;
     }
 
-    public function deleteTask($id) {
-        return 'Delete Task with id: ' .$id;;
+    public function deleteTask($id)
+    {
+        return 'Delete Task with id: ' . $id;;
     }
 };
-
