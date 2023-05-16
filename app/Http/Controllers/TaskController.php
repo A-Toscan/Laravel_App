@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
@@ -19,11 +20,19 @@ class TaskController extends Controller
             //TODO Validaciones
 
             // Insert using query builder
-            $newTask = DB::table('tasks')->insert([
-                'title' => $title,
-                'description' => $description,
-                'user_id' => $userId
-            ]);
+            // $newTask = DB::table('tasks')->insert([
+            //     'title' => $title,
+            //     'description' => $description,
+            //     'user_id' => $userId
+            // ]);
+
+            //Insert with eloquent
+            $newTask = new Task();
+            $newTask->title = $title;
+            $newTask->description = $description;
+            $newTask->user_id = $userId;
+            $newTask->save();
+
 
             return response()->json([
                 [
@@ -34,14 +43,14 @@ class TaskController extends Controller
                 201
             ]);
         } catch (\Throwable $th) {
-           return response()->json(
-            [
-                "success" => false,
+            return response()->json(
+                [
+                    "success" => false,
                     "message" => "Error creating tasks",
-                    "data" => $th->getMessage()
-            ],
-            500
-        );
+                    "error" => $th->getMessage()
+                ],
+                500
+            );
         }
     }
 
