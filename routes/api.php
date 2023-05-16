@@ -18,6 +18,21 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::get('/', function () {
-    return 'Benvenido a mi App';
+
+
+Route::post('/tasks', function () {
+    return 'Create Task';
 });
+
+Route::get('/tasks', function () {
+    return 'Get Tasks';
+});
+
+Route::put('/tasks/{id}', function ($id) {
+    return 'Update Task with id: '.$id;
+});
+
+Route::delete('/tasks/{id}', function ($id) {
+    return 'Delete Task with id: '.$id;
+});
+
