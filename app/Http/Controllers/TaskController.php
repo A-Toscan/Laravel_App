@@ -3,30 +3,50 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use PhpParser\Node\Stmt\TryCatch;
 
 class TaskController extends Controller
 {
     public function createTask(Request $request)
     {
-
         try {
-            $title = $request->input('title');
-            $description = $request->input('description');
-            $userId = $request->input('user_id');
+            Log::info("Creating task");
 
-            //TODO Validaciones
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|string|max:10',
+                'description' => 'required',
+                'user_id' => 'required'
+            ]);
 
-            // Insert using query builder
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'success' => true,
+                        'message' => "Body validation error",
+                        'errors' => $validator->errors()
+                    ],
+                    400
+                );
+            }
+
+            $title = $request->input("title");
+            $description = $request->input("description");
+            $userId = $request->input("user_id");
+            // $status = $request->input("status");
+            // // insert usiing query builder
             // $newTask = DB::table('tasks')->insert([
             //     'title' => $title,
             //     'description' => $description,
-            //     'user_id' => $userId
+            //     "user_id" => $userId,
+            //     // "status" => $status
             // ]);
 
-            //Insert with eloquent
+            // insert with elocuent opcion A
             $newTask = new Task();
             $newTask->title = $title;
             $newTask->description = $description;
@@ -35,97 +55,147 @@ class TaskController extends Controller
 
 
             return response()->json([
-                [
-                    "success" => true,
-                    "message" => "Create tasks successfully",
-                    "data" => $newTask
-                ],
-                201
-            ]);
+                "success" => true,
+                "message" => "create task successfully",
+                "data" => $newTask
+            ], 201);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    "success" => false,
-                    "message" => "Error creating tasks",
-                    "error" => $th->getMessage()
-                ],
-                500
-            );
+
+            Log::alert($th->getMessage());
+
+            return response()->json([
+                "success" => false,
+                "message" => "error creating task",
+                "error" => $th->getMessage()
+            ], 500);
         }
     }
 
-    public function getAllTasks($id)
+
+    public function getTask($id)
     {
         try {
-
             $tasks = Task::query()
                 ->where('user_id', '=', $id)
                 ->get()
                 ->toArray();
 
             return response()->json([
-                [
-                    "success" => true,
-                    "message" => "Get all tasks successfully",
-                    "data" => $tasks
-                ],
-                201
-            ]);
+                "success" => true,
+                "message" => "Get tasks successfully",
+                "data" => $tasks
+            ], 201);
         } catch (\Throwable $th) {
-            return response()->json(
-                [
-                    "success" => false,
-                    "message" => "Error getting tasks",
-                    "error" => $th->getMessage()
-                ],
-                500
-            );
+
+            return response()->json([
+                "success" => false,
+                "message" => "error creating task",
+                "error" => $th->getMessage()
+            ], 500);
         }
     }
 
-    public function updateTask($id)
+    public function updateTask(Request $request, $id)
     {
-        return 'Update Tasks with id: ' . $id;
+        try {
+
+            Log::info("update task");
+
+            $validator = Validator::make($request->all(), [
+                'title' => 'string|max:10',
+                'description' => 'string',
+                'status' => "in:progress,finished"
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'success' => true,
+                        'message' => "Body validation error",
+                        'errors' => $validator->errors()
+                    ],
+                    400
+                );
+            }
+
+            $task = Task::find($id);
+
+            if (!$task) {
+                return response()->json(
+                    [
+                        'success' => true,
+                        'message' => "task doesnt exits",
+                        'errors' => $validator->errors()
+                    ],
+                    404
+                );
+            }
+
+            $title = $request->input('title');
+            $description = $request->input('description');
+            $status = $request->input('status');
+
+            if (isset($title)) {
+                $task->title = $request->input('title');
+            }
+
+            if (isset($description)) {
+                $task->description = $request->input('description');
+            }
+
+            if (isset($status)) {
+                $task->status = $request->input('status');
+            }
+
+
+
+            $task->save();
+
+            return response()->json([
+                "success" => true,
+                "message" => "Updated task successfully",
+                "data" => $task
+            ], 201);
+        } catch (\Throwable $th) {
+            Log::alert($th->getMessage());
+
+            return response()->json([
+                "success" => false,
+                "message" => "error updating task",
+                "error" => $th->getMessage()
+            ], 500);
+        }
     }
 
     public function deleteTask($id)
     {
         try {
             $task = Task::query()
-                ->where('id', '=', $id)
+                ->where("id", "=", $id)
                 ->first();
 
             if (!$task) {
-                return response()->json(
-                    [
-                        "success" => true,
-                        "message" => "Task doesn't exist",
-                    ],
-                    404
-                );
+
+                return response()->json([
+                    "success" => true,
+                    "message" => "Task doesnt exists",
+                ], 404);
             }
 
-            $taskDeleted = Task::destroy($id);
-
+            $tasksDeleted = Task::destroy($id);
 
             return response()->json([
-                [
-                    "success" => true,
-                    "message" => "Delete task successfully",
-                    "data" => $taskDeleted
-                ],
-                200
-            ]);
+                "success" => true,
+                "message" => "Deleted task successfully",
+                "data" => $tasksDeleted
+            ], 201);
         } catch (\Throwable $th) {
 
-            return response()->json(
-                [
-                    "success" => false,
-                    "message" => "Error deleting task",
-                    "error" => $th->getMessage()
-                ],
-                500
-            );
+            return response()->json([
+                "success" => false,
+                "message" => "error deleting task",
+                "error" => $th->getMessage()
+            ], 500);
         }
     }
-};
+}
